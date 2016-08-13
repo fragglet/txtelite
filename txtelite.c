@@ -35,6 +35,7 @@ of Elite with no combat or missions.
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 
 #define true (-1)
 #define false (0)
@@ -309,17 +310,6 @@ void stripout(char *s,const char c) /* Remove all c's from string s */
     }
     s[j]=0;
 }
-
-int toupper(char c)
-{	if((c>='a')&&(c<='z')) return(c+'A'-'a');
-	return((int)c);
-}
-
-int tolower(char c)
-{	if((c>='A')&&(c<='Z')) return(c+'a'-'A');
-	return((int)c);
-}
-
 
 int stringbeg(char *s,char *t)
 /* Return nonzero iff string t begins with non-empty string s */
