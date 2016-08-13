@@ -900,6 +900,11 @@ int gen_rnd_number (void)
 void goat_soup(const char *source,plansys * psy)
 {	for(;;)
 	{	int c=*(source++);
+		/* Take just the lower byte of the character. Most C
+		   implementations define char as signed by default; if we
+		   don't do this then the special \x escapes above will be
+		   interpreted as negative. */
+		c &= 0xff;
 		if(c=='\0')	break;
 		if(c<0x80) printf("%c",c);
 		else
