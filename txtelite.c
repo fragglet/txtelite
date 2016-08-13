@@ -589,7 +589,7 @@ void prisys(plansys plsy,boolean compressed)
 /**-Various command functions **/
 
 boolean dotweakrand(char * s)
-{	 (void *)&s;
+{
    nativerand ^=1;
    return true;
 }
