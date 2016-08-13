@@ -333,6 +333,23 @@ uint stringmatch(char *s,char a[][20],uint n)
 return 0;
 }
 
+/* Strip leading and trailing space characters from the given string. */
+char *spacestrip(char *s)
+{
+  char *p;
+  while (*s != '\0' && isspace(*s))
+  {
+    ++s;
+  }
+  p = s + strlen(s);
+  while (p > s && isspace(*(p - 1)))
+  {
+    --p;
+    *p = '\0';
+  }
+  return s;
+}
+
 void spacesplit(char *s,char *t)
 /* Split string s at first space, returning first 'word' in t & shortening s
 */
@@ -736,6 +753,9 @@ boolean domkt(char *s) /* Show stock market */
 boolean parser(char *s) /* Obey command s */
 {  uint i;
    char c[maxlen];
+   s = spacestrip(s);
+   if (strlen(s) == 0)
+     return false;
    spacesplit(s,c);
    i=stringmatch(c,commands,nocomms);
    if(i)return (*comfuncs[i-1])(s) ;
