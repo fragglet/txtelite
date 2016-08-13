@@ -808,6 +808,8 @@ int main()
      parser(getcommand);
    }
 
+   printf("\n");
+
    /* 6502 Elite fires up at Lave with fluctuation=00
       and these prices tally with the NES ones.
       However, the availabilities reside in the saved game data.
