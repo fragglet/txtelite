@@ -424,10 +424,10 @@ void displaymarket(markettype m)
 {	unsigned short i;
  	for(i=0;i<=lasttrade;i++)
  	{ printf("\n");
-   printf(commodities[i].name);
+   printf("%s", commodities[i].name);
    printf("   %.1f",((float)(m.price[i])/10));
    printf("   %u",m.quantity[i]);
-   printf(unitnames[commodities[i].units]);
+   printf("%s", unitnames[commodities[i].units]);
    printf("   %u",shipshold[i]);
  }
 }	
@@ -569,13 +569,13 @@ void prisys(plansys plsy,boolean compressed)
 	}
 	else
 	{	printf("\n\nSystem:  ");
-  	printf(plsy.name);
+  	printf("%s", plsy.name);
   	printf("\nPosition (%i,",plsy.x);
   	printf("%i)",plsy.y);
   	printf("\nEconomy: (%i) ",plsy.economy);
-  	printf(econnames[plsy.economy]);
+  	printf("%s", econnames[plsy.economy]);
   	printf("\nGovernment: (%i) ",plsy.govtype);
-  	printf(govnames[plsy.govtype]);
+  	printf("%s", govnames[plsy.govtype]);
   	printf("\nTech Level: %2i",(plsy.techlev)+1);
   	printf("\nTurnover: %u",(plsy.productivity));
   	printf("\nRadius: %u",plsy.radius);
@@ -677,10 +677,10 @@ boolean dosell(char *s) /* Sell ammount S(2) of good S(1) */
   if(t==0) { printf("Cannot sell any "); }
   else
   {	printf("\nSelling %i",t);
-    printf(unitnames[commodities[i].units]);
+    printf("%s", unitnames[commodities[i].units]);
     printf(" of ");
   }
-    printf(tradnames[i]);
+    printf("%s", tradnames[i]);
 
     return true;
 
@@ -701,10 +701,10 @@ boolean dobuy(char *s) /* Buy ammount S(2) of good S(1) */
 	if(t==0) printf("Cannot buy any ");
   else
   { printf("\nBuying %i",t);
-    printf(unitnames[commodities[i].units]);
+    printf("%s", unitnames[commodities[i].units]);
     printf(" of ");
   }
-  printf(tradnames[i]);
+  printf("%s", tradnames[i]);
   return true;
 }
 
@@ -750,7 +750,7 @@ boolean parser(char *s) /* Obey command s */
    i=stringmatch(c,commands,nocomms);
    if(i)return (*comfuncs[i-1])(s) ;
    printf("\n Bad command (");
-   printf(c);
+   printf("%s", c);
    printf(")");
    return false;
 }
