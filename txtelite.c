@@ -812,13 +812,12 @@ int main()
 
    for(;;)
    { printf("\n\nCash :%.1f>",((float)cash)/10);
-     gets(getcommand);
+     if (!fgets(getcommand, sizeof(getcommand) - 1, stdin))
+       break;
+     getcommand[sizeof(getcommand) - 1] = '\0';
      parser(getcommand);
    }
-   
-   /* Unreachable */
 
- 
    /* 6502 Elite fires up at Lave with fluctuation=00
       and these prices tally with the NES ones.
       However, the availabilities reside in the saved game data.
