@@ -1,0 +1,173 @@
+
+Welcome to Text Elite 1.5.
+
+Commands are:
+Buy   tradegood ammount
+Sell  tradegood ammount
+Fuel  ammount    (buy ammount LY of fuel)
+Jump  planetname (limited by fuel)
+Sneak planetname (any distance - no fuel cost)
+Galhyp           (jumps to next galaxy)
+Info  planetname (prints info on system
+Mkt              (shows market prices)
+Local            (lists systems within 7 light years)
+Cash number      (alters cash - cheating!)
+Hold number      (change cargo bay)
+Quit or ^C       (exit)
+Help             (display this text)
+Rand             (toggle RNG)
+
+Abbreviations allowed eg. b fo 5 = Buy Food 5, m= Mkt
+
+Cash :100.0>
+
+System:  ZAONCE
+Position (33,185)
+Economy: (1) Average Ind
+Government: (7) Corporate State
+Tech Level: 12
+Turnover: 41976
+Radius: 3873
+Population: 6 Billion
+This planet is a tedious place.
+
+Cash :100.0>
+Buying 5.7LY fuel
+
+Cash :88.6>
+
+System:  BEMAERA
+Position (49,198)
+Economy: (6) Average Agri
+Government: (2) Multi-gov
+Tech Level:  4
+Turnover: 4032
+Radius: 3633
+Population: 2 Billion
+Bemaera is most noted for the Bemaeraian deadly Xesooid and its inhabitants' unusual silliness.
+
+Cash :88.6>
+Buying 6.9LY fuel
+
+Cash :74.8>
+
+System:  ENSOREUS
+Position (52,224)
+Economy: (0) Rich Ind
+Government: (7) Corporate State
+Tech Level: 12
+Turnover: 45760
+Radius: 3380
+Population: 6 Billion
+This planet is a tedious little planet.
+
+Cash :74.8>
+Buying 5.3LY fuel
+
+Cash :64.2>
+Buying 2t of Narcotics   
+
+Cash :4.2>
+
+System:  ZAALELA
+Position (46,220)
+Economy: (6) Average Agri
+Government: (1) Feudal
+Tech Level:  5
+Turnover: 3840
+Radius: 3886
+Population: 3 Billion
+This world is  noted for its fabulous goat soup.
+
+Cash :4.2>
+Selling 2t of Narcotics   
+
+Cash :158.6>
+
+System:  ENSOREUS
+Position (52,224)
+Economy: (0) Rich Ind
+Government: (7) Corporate State
+Tech Level: 12
+Turnover: 45760
+Radius: 3380
+Population: 6 Billion
+This planet is a tedious little planet.
+
+Cash :158.6>
+Buying 5.0LY fuel
+
+Cash :148.6>
+Buying 20t of Narcotics   
+
+Cash :124.6>
+
+System:  ZAALELA
+Position (46,220)
+Economy: (6) Average Agri
+Government: (1) Feudal
+Tech Level:  5
+Turnover: 3840
+Radius: 3886
+Population: 3 Billion
+This world is  noted for its fabulous goat soup.
+
+Cash :124.6>
+Selling 20t of Narcotics   
+
+Cash :1668.6>
+
+System:  ENSOREUS
+Position (52,224)
+Economy: (0) Rich Ind
+Government: (7) Corporate State
+Tech Level: 12
+Turnover: 45760
+Radius: 3380
+Population: 6 Billion
+This planet is a tedious little planet.
+
+Cash :1668.6>
+Buying 5.0LY fuel
+
+Cash :1658.6>
+
+Cash :1258.6>
+
+Cash :1258.6>
+Buying 32t of Narcotics   
+
+Cash :1220.2>
+
+System:  ZAALELA
+Position (46,220)
+Economy: (6) Average Agri
+Government: (1) Feudal
+Tech Level:  5
+Turnover: 3840
+Radius: 3886
+Population: 3 Billion
+This world is  noted for its fabulous goat soup.
+
+Cash :1220.2>
+Selling 32t of Narcotics   
+
+Cash :4305.0>
+Buying 35t of Furs        
+
+Cash :2233.0>
+
+System:  ENSOREUS
+Position (52,224)
+Economy: (0) Rich Ind
+Government: (7) Corporate State
+Tech Level: 12
+Turnover: 45760
+Radius: 3380
+Population: 6 Billion
+This planet is a tedious little planet.
+
+Cash :2233.0>
+Selling 35t of Furs        
+
+Cash :5061.0>
