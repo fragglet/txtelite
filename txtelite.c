@@ -112,6 +112,7 @@ uint16_t     galaxynum;               /* Galaxy number (1-8) */
 int32_t      cash;
 uint16_t     fuel;
 markettype   localmarket;
+markettype   markets[UINT16_MAX+1];
 uint16_t     holdspace;
 
 int fuelcost =2; /* 0.2 CR/Light year */
@@ -631,18 +632,25 @@ bool dotweakrand(char * s)
 
 bool dolocal(char *s)
 {
-	planetnum syscount;
-	uint16_t d;
-	atoi(s);
+	uint16_t d = (uint16_t)atoi(s);
+
 	printf("Galaxy number %i",galaxynum);
-	for(syscount=0;syscount<galsize;++syscount)
-	{ 	d=distance(galaxy[syscount],galaxy[currentplanet]);
-		if(d<=maxfuel)
-		{ 	if(d<=fuel)	printf("\n * "); else printf("\n - ");
-			prisys(galaxy[syscount],true);
-			printf(" (%.1f LY)",(float)d/10);
+	for(planetnum syscount=0; syscount < galsize; ++syscount)
+	{
+		d=distance( galaxy[syscount], galaxy[currentplanet] );
+
+		if(d <= maxfuel)
+		{
+			if( d <= fuel )
+				printf("\n * ");
+			else
+				printf("\n - ");
+
+			prisys( galaxy[syscount], true );
+			printf(" (%.1f LY)", (float)d / 10);
 		}
 	}
+
 	return true;
 }
 
@@ -651,9 +659,21 @@ bool dojump(char *s) /* Jump to planet name s */
 {
 	uint16_t d;
 	planetnum dest=matchsys(s);
-	if(dest==currentplanet) { printf("\nBad jump"); return false; }
+
+	if(dest==currentplanet)
+	{
+		printf("\nBad jump");
+		return false;
+	}
+
 	d=distance(galaxy[dest],galaxy[currentplanet]);
-	if (d>fuel) { printf("\nJump to far"); return false; }
+
+	if (d>fuel)
+	{
+		printf("\nJump to far");
+		return false;
+	}
+
 	fuel-=d;
 	gamejump(dest);
 	prisys(galaxy[currentplanet],false);
@@ -716,13 +736,15 @@ bool dohold(char *s)
 
 bool dosell(char *s) /* Sell ammount S(2) of good S(1) */
 {
-	uint16_t i,a,t;
+	uint16_t i;
+	uint16_t a = (uint16_t)atoi(s);
+	uint16_t t;
 	char s2[maxlen];
 	spacesplit(s,s2);
-	a=(uint16_t)atoi(s);
 
 	if (a==0)
 		a=1;
+
 	i=stringmatch(s2,tradnames,lasttrade+1);
 
 	if(i==0)
@@ -827,8 +849,12 @@ bool docash(char *s) /* Cheat alter cash by S */
 
 bool domkt(char *s) /* Show stock market */
 {
-	atoi(s);
-	displaymarket(localmarket);
+	uint16_t i = (uint16_t)atoi(s);
+	if(i > 0)
+		displaymarket(markets[i]);
+	else
+		displaymarket(localmarket);
+
 	printf("\nFuel :%.1f",(float)fuel/10);
 	printf("      Holdspace :%it",holdspace);
 	return true;
