@@ -42,6 +42,8 @@ of Elite with no combat or missions.
 #define tonnes (0)
 #define maxlen (20) /* Length of strings */
 
+int exit_status = EXIT_SUCCESS;
+
 typedef int planetnum;
 
 typedef struct
@@ -69,7 +71,7 @@ typedef struct
 	uint16_t radius; /* Two byte (not used by game at all) */
 	fastseedtype	goatsoupseed;
 	char name[12];
-} plansys ;
+} plansys;
 
 #define galsize (256)
 #define AlienItems (16)
@@ -88,15 +90,26 @@ fastseedtype rnd_seed;
 
 bool nativerand;
 
+/* In 6502 version these were:
 typedef struct
-{                         /* In 6502 version these were: */
-	uint16_t baseprice;        /* one byte */
-	int16_t  gradient;   /* five bits plus sign */
-	uint16_t basequant;        /* one byte */
-	uint16_t maskbyte;         /* one byte */
-	uint16_t units;            /* two bits */
-	char     name[20];         /* longest="Radioactives" */
-} tradegood ;
+{
+	uint8_t baseprice;
+	uint8_t basequant;
+	uint8_t maskbyte;
+	int8_t gradient_units; sign/5bits/2bits
+	char* name[20]; longest="Radioactives"
+}
+*/
+
+typedef struct
+{
+	uint16_t baseprice;
+	int16_t  gradient;
+	uint16_t basequant;
+	uint16_t maskbyte;
+	uint16_t units;
+	char     name[20]; 
+} tradegood;
 
 
 typedef struct
@@ -112,7 +125,6 @@ uint16_t     galaxynum;               /* Galaxy number (1-8) */
 int32_t      cash;
 uint16_t     fuel;
 markettype   localmarket;
-markettype   markets[UINT16_MAX+1];
 uint16_t     holdspace;
 
 int fuelcost =2; /* 0.2 CR/Light year */
@@ -151,11 +163,6 @@ char pairs[] = "..LEXEGEZACEBISO"
 
 #endif
 
-
-
-
-
-
 char govnames[][maxlen]={"Anarchy","Feudal","Multi-gov","Dictatorship",
 	"Communist","Confederacy","Democracy","Corporate State"};
 
@@ -166,8 +173,7 @@ char econnames[][maxlen]={"Rich Ind","Average Ind","Poor Ind","Mainly Ind",
 char unitnames[][5] ={"t","kg","g"};
 
 /* Data for DB's price/availability generation system */
-/*                   Base  Grad Base Mask Un   Name
-		     price ient quant     it              */ 
+/* Base  Grad Base Mask Un   Name price ient quant     it              */ 
 
 #define POLITICALLY_CORRECT	0
 /* Set to 1 for NES-sanitised trade goods */
@@ -202,13 +208,14 @@ tradegood commodities[]=
 	{0x35,+0x0F,0xC0,0x07,0,"Alien Items "},
 };
 
-/**-Required data for text interface **/
-char tradnames[lasttrade][maxlen]; /* Tradegood names used in text commands
-				      Set using commodities array */
+/* ================================ *
+ * Required data for text interface *
+ * ================================ */
 
+/* Tradegood names used in text commands Set using commodities array */
+char tradnames[lasttrade][maxlen]; 
 
 void goat_soup(const char *source,plansys * psy);
-
 
 #define nocomms (14)
 
@@ -243,7 +250,9 @@ bool (*comfuncs[nocomms])(char *)=
 	doquit,                              dotweakrand
 };  
 
-/**- General functions **/
+/* ================= *
+ * General functions *
+ * ================= */
 void port_srand(unsigned int);
 int port_rand(void);
 
@@ -288,13 +297,11 @@ void stop(char * string)
 	exit(1);
 }
 
-/**+  ftoi **/
 signed int ftoi(double value)
 { 
 	return ((signed int)floor(value+0.5));
 }
 
-/**+  ftoi2 **/
 signed int ftoi2(double value)
 {
 	return ((signed int)floor(value));
@@ -309,8 +316,12 @@ void tweakseed(seedtype *s)
 	(*s).w2 = temp;
 }
 
-/**-String functions for text interface **/
-void stripout(char *s,const char c) /* Remove all c's from string s */
+/* =================================== *
+ * String functions for text interface *
+ * =================================== */
+
+/* Remove all c's from string s */
+void stripout(char *s,const char c)
 {
 	size_t i=0,j=0;
 
@@ -323,8 +334,8 @@ void stripout(char *s,const char c) /* Remove all c's from string s */
 	s[j]=0;
 }
 
-int stringbeg(char *s,char *t)
-	/* Return nonzero iff string t begins with non-empty string s */
+/* Return nonzero iff string t begins with non-empty string s */
+bool stringbeg(char *s,char *t)
 {
 	size_t i=0;
 	size_t l=strlen(s);
@@ -335,9 +346,11 @@ int stringbeg(char *s,char *t)
 	return false;
 }
 
+/* 
+ * Check string s against n options in string array a
+ * If matches ith element return i+1 else return 0
+ */
 uint16_t stringmatch(char *s,char a[][20],uint16_t n)
-	/* Check string s against n options in string array a
-	   If matches ith element return i+1 else return 0 */
 {
 	for(uint16_t i = 0; i < n; i++)
 	{
@@ -365,37 +378,61 @@ char *spacestrip(char *s)
 	return s;
 }
 
+/* Split string s at first space, returning first 'word' in t & shortening s */
 void spacesplit(char *s,char *t)
-	/* Split string s at first space, returning first 'word' in t & shortening s
-	*/
 {
-	size_t i=0,j=0;
 	size_t l=strlen(s);
-	while((i<l)&(s[i]==' ')) i++;; /* Strip leading spaces */
-	if(i==l) {s[0]=0; t[0]=0; return;};
-	while((i<l)&(s[i]!=' ')) t[j++]=s[i++];
-	t[j]=0;	i++; j=0;
-	while(i<l) s[j++]=s[i++];
+	size_t i=0,j=0;
+
+	/* Strip leading spaces */
+	for(; (i < l) &(s[i]==' '); i++);
+
+	if(i == l)
+	{
+		s[0]=0;
+		t[0]=0;
+		return;
+	};
+
+	for(; (i < l ) &(s[i] != ' '); i++, j++)
+		t[j] = s[i];
+
+	t[j]=0;
+	i++;
+	j=0;
+
+	for(; i < l; i++, j++)
+	{
+		s[j] = s[i];
+	}
+
 	s[j]=0;
 }
 
-/**-Functions for stock market **/
+/* ========================== *
+ * Functions for stock market *
+ * ========================== */
 
+/* 
+ * Try to buy ammount a  of good i
+ * Return ammount bought
+ * Cannot buy more than is availble, can afford, or will fit in hold
+ */
 uint16_t gamebuy(uint16_t i, uint16_t a)
-	/* Try to buy ammount a  of good i  Return ammount bought */
-	/* Cannot buy more than is availble, can afford, or will fit in hold */
 {
 	uint16_t t;
-	if(cash<0) t=0;
+	if(cash < 0) t=0;
 	else
-	{	t=mymin(localmarket.quantity[i],a);
+	{
+		t=mymin(localmarket.quantity[i],a);
 		if ((commodities[i].units)==tonnes) {t = mymin(holdspace,t);}
 		t = mymin(t, (uint16_t)floor((double)cash/(localmarket.price[i])));
 	}
 	shipshold[i]+=t;
 	localmarket.quantity[i]-=t;
 	cash-=t*(localmarket.price[i]);
-	if ((commodities[i].units)==tonnes) {holdspace-=t;}
+	if ((commodities[i].units)==tonnes)
+		holdspace-=t;
 	return t;
 }
 
@@ -410,28 +447,14 @@ uint16_t gamesell(uint16_t i,uint16_t a) /* As gamebuy but selling */
 }
 
 markettype genmarket(uint16_t fluct, plansys p)
-	/* Prices and availabilities are influenced by the planet's economy type
-	   (0-7) and a random "fluctuation" byte that was kept within the saved
-	   commander position to keep the market prices constant over gamesaves.
-	   Availabilities must be saved with the game since the player alters them
-	   by buying (and selling(?))
-
-	   Almost all operations are one byte only and overflow "errors" are
-	   extremely frequent and exploited.
-
-	   Trade Item prices are held internally in a single byte=true value/4.
-	   The decimal point in prices is introduced only when printing them.
-	   Internally, all prices are integers.
-	   The player's cash is held in four bytes. 
-	   */
-
 {
 	markettype market;
-	unsigned short i;
+	uint16_t i;
 	for(i=0;i<=lasttrade;i++)
-	{	signed int q; 
-		signed int product = (p.economy)*(commodities[i].gradient);
-		signed int changing = fluct & (commodities[i].maskbyte);
+	{
+		int32_t q; 
+		int32_t product = (p.economy)*(commodities[i].gradient);
+		int32_t changing = fluct & (commodities[i].maskbyte);
 		q =  (commodities[i].basequant) + changing - product;	
 		q = q&0xFF;
 		if(q&0x80) {q=0;};                       /* Clip to positive 8-bit */
@@ -448,7 +471,7 @@ markettype genmarket(uint16_t fluct, plansys p)
 
 void displaymarket(markettype m)
 {
-	unsigned short i;
+	uint16_t i;
 	for(i=0;i<=lasttrade;i++)
 	{ printf("\n");
 		printf("%s", commodities[i].name);
@@ -459,8 +482,8 @@ void displaymarket(markettype m)
 	}
 }	
 
-/**-Generate system info from seed **/
 
+/* Generate system info from seed */
 plansys makesystem(seedtype *s)
 {
 	plansys thissys;
@@ -523,14 +546,17 @@ plansys makesystem(seedtype *s)
 }  
 
 
-/**+Generate galaxy **/
+/* =============== *
+ * Generate galaxy *
+ * =============== */
 
+/* ================================= *
+ * Functions for galactic hyperspace *
+ * ================================= */
 
-/* Functions for galactic hyperspace */
-
-uint16_t rotatel(uint16_t x) /* rotate 8 bit number leftwards */
-	/* (tried to use chars but too much effort persuading this braindead
-	   language to do bit operations on bytes!) */
+/* rotate 8 bit number leftwards */
+/* (tried to use chars but too much effort persuading this braindead language to do bit operations on bytes!) */
+uint16_t rotatel(uint16_t x) 
 {
 	uint16_t temp = x&128;
 	return (2*(x&127))+(temp>>7);
@@ -541,7 +567,8 @@ uint16_t twist(uint16_t x)
 	return (uint16_t)((256*rotatel(x>>8))+rotatel(x&255));
 } 
 
-void nextgalaxy(seedtype *s) /* Apply to base seed; once for galaxy 2  */
+/* Apply to base seed; once for galaxy 2  */
+void nextgalaxy(seedtype *s)
 { 
 	(*s).w0 = twist((*s).w0);  /* twice for galaxy 3, etc. */
 	(*s).w1 = twist((*s).w1);  /* Eighth application gives galaxy 1 again*/
@@ -558,24 +585,27 @@ void buildgalaxy(uint16_t galaxynum)
 	for(syscount=0;syscount<galsize;++syscount) galaxy[syscount]=makesystem(&seed);
 }
 
-/**-Functions for navigation **/
+/* ======================== *
+ * Functions for navigation *
+ * ======================== */
 
-void gamejump(planetnum i) /* Move to system i */
+/* Move to system i */
+void gamejump(planetnum i)
 {
 	currentplanet=i;
 	localmarket = genmarket(randbyte(),galaxy[i]);
 }
 
+/* Seperation between two planets (4*sqrt(X*X+Y*Y/4)) */
 uint16_t distance(plansys a,plansys b)
-	/* Seperation between two planets (4*sqrt(X*X+Y*Y/4)) */
 {
 	return (uint16_t)ftoi(4*sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)/4));
 }
 
 
+/* Return id of the planet whose name matches passed strinmg
+   closest to currentplanet - if none return currentplanet */
 planetnum matchsys(char *s)
-	/* Return id of the planet whose name matches passed strinmg
-	   closest to currentplanet - if none return currentplanet */
 {
 	planetnum syscount;
 	planetnum p=currentplanet;
@@ -592,8 +622,8 @@ planetnum matchsys(char *s)
 }
 
 
-/**-Print data for given system **/
-	void prisys(plansys plsy,bool compressed)
+/* Print data for given system */
+void prisys(plansys plsy,bool compressed)
 {
 	if (compressed)
 	{	
@@ -622,8 +652,7 @@ planetnum matchsys(char *s)
 	}
 }
 
-/**-Various command functions **/
-
+/* Various command functions */
 bool dotweakrand(char * s)
 {
 	nativerand ^=1;
@@ -655,7 +684,8 @@ bool dolocal(char *s)
 }
 
 
-bool dojump(char *s) /* Jump to planet name s */
+/* Jump to planet name s */
+bool dojump(char *s)
 {
 	uint16_t d;
 	planetnum dest=matchsys(s);
@@ -680,7 +710,8 @@ bool dojump(char *s) /* Jump to planet name s */
 	return true;
 }
 
-bool dosneak(char *s) /* As dojump but no fuel cost */
+/* As dojump but no fuel cost */
+bool dosneak(char *s)
 {
 	uint16_t fuelkeep=fuel;
 	bool b;
@@ -691,11 +722,13 @@ bool dosneak(char *s) /* As dojump but no fuel cost */
 }
 
 
-bool dogalhyp(char *s) /* Jump to next galaxy */
-	/* Preserve planetnum (eg. if leave 7th planet
-	   arrive at 7th planet) 
-	   Classic Elite always jumped to planet nearest (0x60,0x60)
-	   */
+/* Jump to next galaxy */
+bool dogalhyp(char *s)
+/*
+ * Preserve planetnum (eg. if leave 7th planet
+ * arrive at 7th planet) 
+ * Classic Elite always jumped to planet nearest (0x60,0x60)
+ */
 {
 	(void)(&s);     /* Discard s */
 	galaxynum++;
@@ -704,7 +737,8 @@ bool dogalhyp(char *s) /* Jump to next galaxy */
 	return true;
 }
 
-bool doinfo(char *s) /* Info on planet */
+/* Info on planet */
+bool doinfo(char *s)
 {
 	planetnum dest=matchsys(s);
 	prisys(galaxy[dest],false);
@@ -734,7 +768,8 @@ bool dohold(char *s)
 	return true;
 }
 
-bool dosell(char *s) /* Sell ammount S(2) of good S(1) */
+/* Sell ammount S(2) of good S(1) */
+bool dosell(char *s)
 {
 	uint16_t i;
 	uint16_t a = (uint16_t)atoi(s);
@@ -774,7 +809,8 @@ bool dosell(char *s) /* Sell ammount S(2) of good S(1) */
 }
 
 
-bool dobuy(char *s) /* Buy ammount S(2) of good S(1) */
+/* Buy ammount S(2) of good S(1) */
+bool dobuy(char *s)
 {
 	uint16_t i;
 	uint16_t a = (uint16_t)atoi(s);
@@ -807,7 +843,8 @@ bool dobuy(char *s) /* Buy ammount S(2) of good S(1) */
 	return true;
 }
 
-uint16_t gamefuel(uint16_t f) /* Attempt to buy f tonnes of fuel */
+/* Attempt to buy f tonnes of fuel */
+uint16_t gamefuel(uint16_t f)
 {
 	if(f+fuel>maxfuel)
 		f=maxfuel-fuel;
@@ -825,8 +862,8 @@ uint16_t gamefuel(uint16_t f) /* Attempt to buy f tonnes of fuel */
 }
 
 
+/* Buy ammount S of fuel */
 bool dofuel(char *s)
-	/* Buy ammount S of fuel */
 {
 	uint16_t f=gamefuel((uint16_t)floor(10*atof(s)));
 	if(f==0) { printf("\nCan't buy any fuel");}
@@ -834,7 +871,8 @@ bool dofuel(char *s)
 	return true;
 }
 
-bool docash(char *s) /* Cheat alter cash by S */
+/* Cheat alter cash by S */
+bool docash(char *s)
 {
 	int a=(int)(10*atof(s));
 	cash+=(long)a;
@@ -847,20 +885,23 @@ bool docash(char *s) /* Cheat alter cash by S */
 	return false;
 }
 
-bool domkt(char *s) /* Show stock market */
+/* Show stock market */
+bool domkt(char *s)
 {
-	uint16_t i = (uint16_t)atoi(s);
-	if(i > 0)
-		displaymarket(markets[i]);
-	else
+	if((uint16_t)atoi(s) >= 0)
+	{
 		displaymarket(localmarket);
 
-	printf("\nFuel :%.1f",(float)fuel/10);
-	printf("      Holdspace :%it",holdspace);
-	return true;
+		printf("\nFuel :%.1f",(float)fuel/10);
+		printf("      Holdspace :%it",holdspace);
+		return true;
+	}
+	else
+		return false;
 }
 
-bool parser(char *s) /* Obey command s */
+/* Obey command s */
+bool parser(char *s)
 {
 	uint16_t i;
 	char c[maxlen];
@@ -880,8 +921,8 @@ bool parser(char *s) /* Obey command s */
 bool doquit(char *s)
 {
 	(void)(&s);
-	exit(0);
-	return(0);
+	exit(exit_status);
+	return exit_status == EXIT_SUCCESS ? true : false;
 }
 
 bool dohelp(char *s)
@@ -906,26 +947,26 @@ bool dohelp(char *s)
 	return true;
 }
 
-/**+main **/
 int main()
 {
-	uint16_t i;
 	char getcommand[maxlen];
 	nativerand=1;
 	printf("\nWelcome to Text Elite 1.5.\n");
 
-	for(i=0;i<=lasttrade;i++) strcpy(tradnames[i],commodities[i].name);
+	for(uint16_t i = 0; i <= lasttrade; i++)
+		strcpy(tradnames[i], commodities[i].name);
 
 	mysrand(12345);/* Ensure repeatability */
 
-	galaxynum=1;	buildgalaxy(galaxynum);
+	galaxynum=1;
+	buildgalaxy(galaxynum);
 
 	currentplanet=numforLave;                        /* Don't use jump */
 	localmarket = genmarket(0x00,galaxy[numforLave]);/* Since want seed=0 */
 
 	fuel=maxfuel;
 
-#define PARSER(S) { char buf[0x10];strcpy(buf,S);parser(buf);}   
+#define PARSER(S) { char buf[0x10]; strcpy(buf,S); parser(buf); }   
 
 	PARSER("hold 20");         /* Small cargo bay */
 	PARSER("cash +100");       /* 100 CR */
@@ -934,7 +975,8 @@ int main()
 #undef PARSER
 
 	for(;;)
-	{ printf("\n\nCash :%.1f>",((float)cash)/10);
+	{
+		printf("\n\nCash :%.1f>",((float)cash)/10);
 		if (!fgets(getcommand, sizeof(getcommand) - 1, stdin))
 			break;
 		getcommand[sizeof(getcommand) - 1] = '\0';
@@ -943,21 +985,18 @@ int main()
 
 	printf("\n");
 
-	/* 6502 Elite fires up at Lave with fluctuation=00
-	   and these prices tally with the NES ones.
-	   However, the availabilities reside in the saved game data.
-	   Availabilities are calculated (and fluctuation randomised)
-	   on hyperspacing
-	   I have checked with this code for Zaonce with fluctaution &AB 
-	   against the SuperVision 6502 code and both prices and availabilities tally.
-	   */
-	return(0);
+	exit(exit_status);
 }
 
-/* "Goat Soup" planetary description string code - adapted from Christian Pinder's
-   reverse engineered sources. */
+/* =============================================================================== *
+ * "Goat Soup" planetary description string code - adapted from Christian Pinder's *
+ *  reverse engineered sources.                                                    *
+ * =============================================================================== */
 
-struct desc_choice {	const char *option[5];};
+struct desc_choice
+{
+	const char *option[5]; 
+};
 
 static struct desc_choice desc_list[] =
 {
@@ -999,13 +1038,14 @@ static struct desc_choice desc_list[] =
 	/* A4 */	{{"hockey", "cricket", "karate", "polo", "tennis"}},
 };
 
-/* B0 = <planet name>
-   B1 = <planet name>ian
-   B2 = <random name>
-   */
-
+/* 
+ * B0 = <planet name>
+ * B1 = <planet name>ian
+ * B2 = <random name>
+ */
 int gen_rnd_number (void)
-{	int a,x;
+{
+	int a,x;
 	x = (rnd_seed.a * 2) & 0xFF;
 	a = x + rnd_seed.c;
 	if (rnd_seed.a > 127)	a++;
@@ -1022,7 +1062,8 @@ int gen_rnd_number (void)
 
 
 void goat_soup(const char *source,plansys * psy)
-{	for(;;)
+{
+	for(;;)
 	{	int c=*(source++);
 		/* Take just the lower byte of the character. Most C
 		   implementations define char as signed by default; if we
@@ -1030,9 +1071,9 @@ void goat_soup(const char *source,plansys * psy)
 		   interpreted as negative. */
 		c &= 0xff;
 		if(c=='\0')	break;
-		if(c<0x80) printf("%c",c);
+		if(c < 0x80) printf("%c",c);
 		else
-		{	if (c <=0xA4)
+		{	if (c <= 0xA4)
 			{	int rnd = gen_rnd_number();
 				goat_soup(desc_list[c-0x81].option[(rnd >= 0x33)+(rnd >= 0x66)+(rnd >= 0x99)+(rnd >= 0xCC)],psy);
 			}
